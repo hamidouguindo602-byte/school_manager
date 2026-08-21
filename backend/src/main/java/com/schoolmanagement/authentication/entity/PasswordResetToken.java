@@ -1,5 +1,6 @@
 package com.schoolmanagement.authentication.entity;
 
+import com.schoolmanagement.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,11 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PasswordResetToken {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PasswordResetToken extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 100)
     private String token;

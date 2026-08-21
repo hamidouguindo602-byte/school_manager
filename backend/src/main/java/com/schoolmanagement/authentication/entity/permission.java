@@ -1,5 +1,6 @@
 package com.schoolmanagement.authentication.entity;
 
+import com.schoolmanagement.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,11 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Permission {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPermission;
+public class Permission extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 100)
     private String nomPermission;
