@@ -32,8 +32,8 @@ public record UtilisateurRequest(
         StatutUtilisateur statut,
 
         @NotNull
-        TypeRole typeRole
-       // Set<Long> permissionIds
+        TypeRole typeRole,
+        Set<Long> permissionIds
 
 ) {
 }

@@ -36,7 +36,7 @@ public class Utilisateur extends EntieBase {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private TypeRole typeRole;
-    /*
+
     @ManyToMany
     @JoinTable(
             name = "utilisateur_permission",
@@ -45,6 +45,6 @@ public class Utilisateur extends EntieBase {
     )
     private Set<Permission> permissions = new HashSet<>();
 
-*/
+
 
 }

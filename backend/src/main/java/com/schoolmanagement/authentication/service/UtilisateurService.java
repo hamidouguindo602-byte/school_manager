@@ -2,8 +2,9 @@ package com.schoolmanagement.authentication.service;
 
 import com.schoolmanagement.authentication.dto.request.UtilisateurRequest;
 import com.schoolmanagement.authentication.dto.response.UtilisateurResponse;
+import com.schoolmanagement.authentication.entity.Permission;
 import com.schoolmanagement.authentication.entity.Utilisateur;
-//import com.schoolmanagement.authentication.repository.PermissionRepository;
+import com.schoolmanagement.authentication.repository.PermissionRepository;
 import com.schoolmanagement.authentication.repository.UtilisateurRepository;
 import com.schoolmanagement.common.exception.ResourceNotFoundException;
 
@@ -11,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ import java.util.List;
 public class UtilisateurService {
 
     private final UtilisateurRepository utilisateurRepository;
-    //private final PermissionRepository permissionRepository;
+    private final PermissionRepository permissionRepository;
 
     public List<UtilisateurResponse> findAll() {
         return utilisateurRepository.findAll()
@@ -42,7 +45,7 @@ public class UtilisateurService {
                 .motDePasse(request.motDePasse())
                 .statut(request.statut())
                 .typeRole(request.typeRole())
-                //.permissions(getPermissions(request.permissionIds()))
+                .permissions(getPermissions(request.permissionIds()))
                 .build();
 
         return UtilisateurResponse.from(
@@ -77,14 +80,14 @@ public class UtilisateurService {
                         new ResourceNotFoundException("Utilisateur", id)
                 );
     }
-/*
+
     private Set<Permission> getPermissions(Set<Long> permissionIds) {
 
         if (permissionIds == null || permissionIds.isEmpty()) {
             return new HashSet<>();
         }
 
-       List<Permission> permissions = PermissionRepository.findAllById(permissionIds);
+       List<Permission> permissions = permissionRepository.findAllById(permissionIds);
 
         if (permissions.size() != permissionIds.size()) {
             throw new IllegalArgumentException(
@@ -93,6 +96,6 @@ public class UtilisateurService {
         }
 
         return new HashSet<>(permissions);
-    }*/
+    }
 
 }
