@@ -1,6 +1,6 @@
 package com.schoolmanagement.authentication.entity;
 
-import com.schoolmanagement.common.domain.BaseEntity;
+import com.schoolmanagement.common.domain.EntieBase;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PasswordResetToken extends BaseEntity {
+public class PasswordResetToken extends EntieBase {
 
     @Column(nullable = false, unique = true, length = 100)
     private String token;
@@ -26,5 +26,5 @@ public class PasswordResetToken extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Utilisateur user;
 }

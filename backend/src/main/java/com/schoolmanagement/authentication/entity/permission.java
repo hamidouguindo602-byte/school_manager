@@ -1,6 +1,6 @@
 package com.schoolmanagement.authentication.entity;
 
-import com.schoolmanagement.common.domain.BaseEntity;
+import com.schoolmanagement.common.domain.EntieBase;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Permission extends BaseEntity {
+public class Permission extends EntieBase {
 
     @Column(nullable = false, unique = true, length = 100)
     private String nomPermission;
