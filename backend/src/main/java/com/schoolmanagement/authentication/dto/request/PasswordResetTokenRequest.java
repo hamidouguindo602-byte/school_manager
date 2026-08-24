@@ -1,17 +1,12 @@
 package com.schoolmanagement.authentication.dto.request;
 
-import lombok.*;
-
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class PasswordResetTokenRequest {
-    private String token;
-    private LocalDateTime expiryDate;
-    private boolean used;
     private Long userId;
 }

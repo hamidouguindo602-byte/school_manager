@@ -57,4 +57,17 @@ public class UtilisateurController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/activer")
+    public ResponseEntity<Void> activer(@PathVariable Long id) {
+        utilisateurService.activer(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/desactiver")
+    public ResponseEntity<Void> desactiver(@PathVariable Long id) {
+        utilisateurService.desactiver(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
