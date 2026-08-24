@@ -1,5 +1,7 @@
 package com.schoolmanagement.common.exception;
 
+import com.schoolmanagement.administration.emploi_temps.exception.ConflitHoraireException;
+
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +35,18 @@ public class GlobalExceptionHandler {
 		ApiError body = new ApiError(Instant.now(), 400, "Bad Request",
 				"Donnees invalides", request.getRequestURI(), fieldErrors);
 		return ResponseEntity.badRequest().body(body);
+	}
+
+	@ExceptionHandler(ConflitHoraireException.class)
+	public ResponseEntity<ApiError> handleConflitHoraire(ConflitHoraireException ex, HttpServletRequest request) {
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(ApiError.of(409, "Conflict", ex.getMessage(), request.getRequestURI()));
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<ApiError> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest request) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.body(ApiError.of(400, "Bad Request", ex.getMessage(), request.getRequestURI()));
 	}
 
 	@ExceptionHandler(Exception.class)

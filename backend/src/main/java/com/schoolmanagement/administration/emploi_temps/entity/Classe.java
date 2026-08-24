@@ -10,11 +10,11 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "matieres")
-public class Matiere extends EntieBase {
+@Table(name = "classes")
+public class Classe extends EntieBase {
     @Column(nullable = false, length = 50)
-    private String nomMatiere;
+    private String nomClasse;
 
-    @Column(nullable = false)
-    private Float coefficient;
+    @Column(nullable = false, length = 50)
+    private String niveau;
 }
