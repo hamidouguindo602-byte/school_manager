@@ -6,6 +6,7 @@ import com.schoolmanagement.authentication.entity.Log;
 import com.schoolmanagement.authentication.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/logs")
+@PreAuthorize("hasRole('ADMIN')")
 public class LogController {
 
     @Autowired

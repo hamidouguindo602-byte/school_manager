@@ -12,6 +12,9 @@ import java.util.Set;
 public record UtilisateurRequest(
 
         @NotBlank
+        @Size(max = 20)
+        String numeroTelephone,
+
         @Email
         @Size(max = 100)
         String email,

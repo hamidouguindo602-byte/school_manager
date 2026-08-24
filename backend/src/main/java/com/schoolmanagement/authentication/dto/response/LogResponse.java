@@ -10,7 +10,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class LogResponse {
+
     private Long id;
+
     private String action;
+
     private LocalDateTime dateAction;
+
+    private Long utilisateurId;
 }

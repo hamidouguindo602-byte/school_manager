@@ -4,6 +4,7 @@ import com.schoolmanagement.authentication.dto.request.PasswordResetTokenRequest
 import com.schoolmanagement.authentication.dto.response.PasswordResetTokenResponse;
 import com.schoolmanagement.authentication.entity.PasswordResetToken;
 import com.schoolmanagement.authentication.service.PasswordResetTokenService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/password-reset-tokens")
+@PreAuthorize("hasRole('ADMIN')")
 public class PasswordResetTokenController {
 
     @Autowired

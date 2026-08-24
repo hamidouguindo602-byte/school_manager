@@ -26,6 +26,12 @@ public class GlobalExceptionHandler {
 				.body(ApiError.of(404, "Not Found", ex.getMessage(), request.getRequestURI()));
 	}
 
+	@ExceptionHandler(AuthentificationException.class)
+	public ResponseEntity<ApiError> handleAuthentication(AuthentificationException ex, HttpServletRequest request) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+				.body(ApiError.of(401, "Unauthorized", ex.getMessage(), request.getRequestURI()));
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
 		Map<String, String> fieldErrors = new HashMap<>();

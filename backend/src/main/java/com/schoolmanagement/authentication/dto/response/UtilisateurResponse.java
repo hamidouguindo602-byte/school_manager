@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 public record UtilisateurResponse(
         Long id,
+        String numeroTelephone,
         String email,
         String nom,
         String prenom,
@@ -26,6 +27,7 @@ public record UtilisateurResponse(
 
         return new UtilisateurResponse(
                 utilisateur.getId(),
+                utilisateur.getNumeroTelephone(),
                 utilisateur.getEmail(),
                 utilisateur.getNom(),
                 utilisateur.getPrenom(),

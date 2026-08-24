@@ -10,6 +10,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class LogRequest {
+
     private String action;
+
     private LocalDateTime dateAction;
+
+    private Long utilisateurId;
 }

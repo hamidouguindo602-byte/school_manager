@@ -2,7 +2,9 @@ package com.schoolmanagement.authentication.service;
 
 import com.schoolmanagement.authentication.dto.request.LogRequest;
 import com.schoolmanagement.authentication.entity.Log;
+import com.schoolmanagement.authentication.entity.Utilisateur;
 import com.schoolmanagement.authentication.repository.LogRepository;
+import com.schoolmanagement.authentication.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +17,37 @@ public class LogService {
     @Autowired
     private LogRepository logRepository;
 
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
+
     // 🔹 Enregistrer une action
-    public Log enregistrerAction(String action) {
+    public Log enregistrerAction(String action, Long utilisateurId) {
+
+        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
         Log log = Log.builder()
                 .action(action)
                 .dateAction(LocalDateTime.now())
+                .utilisateur(utilisateur)
                 .build();
+
+
         return logRepository.save(log);
     }
 
     // 🔹 Créer un log via DTO
     public Log createLog(LogRequest request) {
+
+        Utilisateur utilisateur = utilisateurRepository.findById(request.getUtilisateurId())
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+
         Log log = Log.builder()
                 .action(request.getAction())
-                .dateAction(request.getDateAction())
+                .dateAction(LocalDateTime.now())
+                .utilisateur(utilisateur)
                 .build();
+
         return logRepository.save(log);
     }
 

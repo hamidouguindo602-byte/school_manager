@@ -3,12 +3,13 @@ package com.schoolmanagement.authentication.service;
 import com.schoolmanagement.authentication.dto.request.UtilisateurRequest;
 import com.schoolmanagement.authentication.dto.response.UtilisateurResponse;
 import com.schoolmanagement.authentication.entity.Permission;
+import com.schoolmanagement.authentication.entity.StatutUtilisateur;
 import com.schoolmanagement.authentication.entity.Utilisateur;
 import com.schoolmanagement.authentication.repository.PermissionRepository;
 import com.schoolmanagement.authentication.repository.UtilisateurRepository;
 import com.schoolmanagement.common.exception.ResourceNotFoundException;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class UtilisateurService {
 
     private final UtilisateurRepository utilisateurRepository;
     private final PermissionRepository permissionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<UtilisateurResponse> findAll() {
         return utilisateurRepository.findAll()
@@ -41,8 +43,9 @@ public class UtilisateurService {
         Utilisateur utilisateur = Utilisateur.builder()
                 .nom(request.nom())
                 .prenom(request.prenom())
-                .email(request.email())
-                .motDePasse(request.motDePasse())
+                .numeroTelephone(request.numeroTelephone())
+                .email(normalizeEmail(request.email()))
+                .motDePasse(passwordEncoder.encode(request.motDePasse()))
                 .statut(request.statut())
                 .typeRole(request.typeRole())
                 .permissions(getPermissions(request.permissionIds()))
@@ -60,11 +63,15 @@ public class UtilisateurService {
 
         entity.setNom(request.nom());
         entity.setPrenom(request.prenom());
-        entity.setEmail(request.email());
-        entity.setMotDePasse(request.motDePasse());
+        entity.setNumeroTelephone(request.numeroTelephone());
+        entity.setEmail(normalizeEmail(request.email()));
+
+        entity.setMotDePasse(
+                passwordEncoder.encode(request.motDePasse())
+        );
+
         entity.setStatut(request.statut());
         entity.setTypeRole(request.typeRole());
-        //entity.setPermissions(getPermissions(request.permissionIds()));
 
         return UtilisateurResponse.from(entity);
     }
@@ -87,7 +94,8 @@ public class UtilisateurService {
             return new HashSet<>();
         }
 
-       List<Permission> permissions = permissionRepository.findAllById(permissionIds);
+        List<Permission> permissions =
+                permissionRepository.findAllById(permissionIds);
 
         if (permissions.size() != permissionIds.size()) {
             throw new IllegalArgumentException(
@@ -98,4 +106,19 @@ public class UtilisateurService {
         return new HashSet<>(permissions);
     }
 
+    private String normalizeEmail(String email) {
+        return email == null || email.isBlank() ? null : email;
+    }
+
+    @Transactional
+    public void activer(Long id) {
+        Utilisateur utilisateur = getOrThrow(id);
+        utilisateur.setStatut(StatutUtilisateur.ACTIF);
+    }
+
+    @Transactional
+    public void desactiver(Long id) {
+        Utilisateur utilisateur = getOrThrow(id);
+        utilisateur.setStatut(StatutUtilisateur.INACTIF);
+    }
 }
