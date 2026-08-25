@@ -45,7 +45,9 @@ public class ConfigurationSecurite {
                                 .requestMatchers(
                                         "/api/authentification/connexion",
                                         "/api/authentification/mot-de-passe-oublie",
-                                        "/api/authentification/reinitialiser-mot-de-passe"
+                                        "/api/authentification/reinitialiser-mot-de-passe",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
