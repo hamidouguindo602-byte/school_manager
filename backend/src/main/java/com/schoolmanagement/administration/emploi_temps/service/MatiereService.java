@@ -25,6 +25,8 @@ public class MatiereService {
         Matiere matiere = Matiere.builder()
                 .nomMatiere(request.getNomMatiere())
                 .coefficient(request.getCoefficient())
+                .code(request.getCode())
+                .nom(request.getNom())
                 .build();
         return mapToDto(matiereRepository.save(matiere));
     }
@@ -35,6 +37,8 @@ public class MatiereService {
                 .orElseThrow(() -> new RuntimeException("Matière introuvable"));
         matiere.setNomMatiere(request.getNomMatiere());
         matiere.setCoefficient(request.getCoefficient());
+        matiere.setCode(request.getCode());
+        matiere.setNom(request.getNom());
         return mapToDto(matiereRepository.save(matiere));
     }
 
@@ -51,6 +55,8 @@ public class MatiereService {
         dto.setId(m.getId());
         dto.setNomMatiere(m.getNomMatiere());
         dto.setCoefficient(m.getCoefficient());
+        dto.setCode(m.getCode());
+        dto.setNom(m.getNom());
         return dto;
     }
 }

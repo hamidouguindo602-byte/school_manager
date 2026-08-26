@@ -46,6 +46,7 @@ public class ConfigurationSecurite {
                                         "/api/authentification/connexion",
                                         "/api/authentification/mot-de-passe-oublie",
                                         "/api/authentification/reinitialiser-mot-de-passe"
+
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )

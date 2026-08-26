@@ -17,4 +17,8 @@ public class Matiere extends EntieBase {
 
     @Column(nullable = false)
     private Float coefficient;
+    @Column(length = 20)
+    private String code;
+    @Column(length = 100)
+    private String nom;
 }

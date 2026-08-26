@@ -6,4 +6,6 @@ import lombok.Data;
 public class MatiereRequest {
     private String nomMatiere;
     private Float coefficient;
+    private String code;
+    private String nom;
 }
