@@ -4,6 +4,7 @@ import com.schoolmanagement.common.domain.EntieBase;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import com.schoolmanagement.administration.emploi_temps.entity.Classe;
 
 import java.time.LocalDate;
 
