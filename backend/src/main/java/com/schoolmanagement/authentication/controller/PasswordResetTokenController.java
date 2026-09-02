@@ -4,6 +4,7 @@ import com.schoolmanagement.authentication.dto.request.PasswordResetTokenRequest
 import com.schoolmanagement.authentication.dto.response.PasswordResetTokenResponse;
 import com.schoolmanagement.authentication.entity.PasswordResetToken;
 import com.schoolmanagement.authentication.service.PasswordResetTokenService;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class PasswordResetTokenController {
     }
 
     @PostMapping
-    public ResponseEntity<PasswordResetTokenResponse> createToken(@RequestBody PasswordResetTokenRequest request) {
+    public ResponseEntity<PasswordResetTokenResponse> createToken(@Valid @RequestBody PasswordResetTokenRequest request) {
         PasswordResetToken token = tokenService.generateToken(request.getUserId());
         PasswordResetTokenResponse response = PasswordResetTokenResponse.builder()
                 .id(token.getId())

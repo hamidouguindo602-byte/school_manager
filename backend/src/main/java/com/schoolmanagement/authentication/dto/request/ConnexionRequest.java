@@ -2,18 +2,13 @@ package com.schoolmanagement.authentication.dto.request;
 
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
 public record ConnexionRequest(
-        @Size(max = 20)
-        String numeroTelephone,
-
-        @Email
-        @Size(max = 100)
-        String email,
+        @NotBlank(message = "L'identifiant (email ou numéro de téléphone) est obligatoire")
+        @Size(max = 100, message = "L'identifiant ne doit pas dépasser 100 caractères")
+        String identifiant,
 
         @NotBlank
         @Size(min = 8, max = 30)
@@ -23,16 +18,14 @@ public record ConnexionRequest(
         )
         String motDePasse
 
-
-                                /*{
-        "numeroTelephone": "+2250700000000",
-        "email": null,
+        /*{
+        "identifiant": "0612345678",
+        "motDePasse": "Test123!"
+}
+ou
+{
+        "identifiant": "amadou@gmail.com",
         "motDePasse": "Test123!"
 }*/
 ) {
-                @AssertTrue(message = "Le numéro de téléphone ou l'email est obligatoire")
-                public boolean hasIdentifiant() {
-                                return (numeroTelephone != null && !numeroTelephone.isBlank())
-                                                                || (email != null && !email.isBlank());
-                }
 }

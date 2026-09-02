@@ -4,6 +4,7 @@ import com.schoolmanagement.authentication.dto.request.PermissionRequest;
 import com.schoolmanagement.authentication.dto.response.PermissionResponse;
 import com.schoolmanagement.authentication.entity.Permission;
 import com.schoolmanagement.authentication.service.PermissionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +45,7 @@ public class PermissionController {
     }
 
     @PostMapping
-    public ResponseEntity<PermissionResponse> createPermission(@RequestBody PermissionRequest request) {
+    public ResponseEntity<PermissionResponse> createPermission(@Valid @RequestBody PermissionRequest request) {
         Permission permission = permissionService.createPermission(request);
         PermissionResponse response = PermissionResponse.builder()
                 .id(permission.getId())

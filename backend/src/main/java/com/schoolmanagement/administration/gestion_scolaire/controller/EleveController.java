@@ -87,10 +87,10 @@ public class EleveController {
 
     /**
      * Récupérer les notes d'un élève
-     */
+
     @GetMapping("/{id}/notes")
     public ResponseEntity<List<Object>> obtenirNotesParEleve(@PathVariable Long id) {
         // Remplacez 'Object' par votre 'NoteResponse' lorsque le service sera prêt
         return ResponseEntity.ok(eleveService.obtenirNotesParEleve(id));
-    }
+    }*/
 }

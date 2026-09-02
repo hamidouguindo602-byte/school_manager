@@ -33,18 +33,9 @@ public class AuthentificationService {
 
     public ConnexionResponse connexion(ConnexionRequest request){
         //etape 1: verifier que l'utilisateur existe dans la base.
-        if (request.numeroTelephone() == null
-                && (request.email() == null || request.email().isBlank())) {
-            throw new AuthentificationException(
-                    "Le numéro de téléphone ou l'email est obligatoire"
-            );
-        }
-
-        Utilisateur utilisateur = (request.email() != null && !request.email().isBlank()
-                ? utilisateurRepository.findByEmail(request.email())
-                : utilisateurRepository.findByNumeroTelephone(request.numeroTelephone()))
+        Utilisateur utilisateur = utilisateurRepository.findByIdentifiant(request.identifiant())
                 .orElseThrow(() ->
-                        new AuthentificationException("Numéro de téléphone ou mot de passe incorrect")
+                        new AuthentificationException("Identifiant ou mot de passe incorrect")
                 );
         // Étape 2 : vérifier que le compte est actif
         if (utilisateur.getStatut() != StatutUtilisateur.ACTIF) {
@@ -59,7 +50,7 @@ public class AuthentificationService {
                 utilisateur.getMotDePasse())) {
 
             throw new AuthentificationException(
-                    "Numéro de téléphone ou mot de passe incorrect"
+                    "Identifiant ou mot de passe incorrect"
             );
         }
         //Etape 4: enregistrer l'action de l'utilisateurs dans la journalisation

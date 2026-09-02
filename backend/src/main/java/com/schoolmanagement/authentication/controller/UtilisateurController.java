@@ -5,6 +5,7 @@ import com.schoolmanagement.authentication.dto.request.UtilisateurRequest;
 import com.schoolmanagement.authentication.dto.response.UtilisateurResponse;
 import com.schoolmanagement.authentication.service.UtilisateurService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-
+//@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/utilisateurs")
 @RequiredArgsConstructor
@@ -30,10 +31,9 @@ public class UtilisateurController {
     public UtilisateurResponse findById(@PathVariable Long id) {
         return utilisateurService.findById(id);
     }
-
-    @PostMapping
+@PostMapping
     public ResponseEntity<UtilisateurResponse> create(
-            @Valid @RequestBody UtilisateurRequest request) {
+        @Valid @RequestBody UtilisateurRequest request) {
 
         UtilisateurResponse created = utilisateurService.create(request);
 

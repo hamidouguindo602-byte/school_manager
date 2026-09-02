@@ -6,13 +6,13 @@ import com.schoolmanagement.authentication.dto.request.ModificationMotDePasseReq
 import com.schoolmanagement.authentication.dto.request.ReinitialisationMotDePasseRequest;
 import com.schoolmanagement.authentication.dto.response.ConnexionResponse;
 import com.schoolmanagement.authentication.service.AuthentificationService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
+@SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping({"/api/authentification", "/api/authentifications"})
+@RequestMapping({"/api/authentification"})
 @RequiredArgsConstructor
 public class AuthentificationController {
 

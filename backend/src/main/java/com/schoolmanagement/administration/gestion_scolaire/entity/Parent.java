@@ -1,7 +1,6 @@
 package com.schoolmanagement.administration.gestion_scolaire.entity;
 
 import com.schoolmanagement.authentication.entity.Utilisateur;
-import com.schoolmanagement.common.domain.EntieBase;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -16,11 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Parent extends EntieBase {
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "idUtilisateur", nullable = false, unique = true)
-    private Utilisateur utilisateur;
+public class Parent extends Utilisateur {
 
     @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)

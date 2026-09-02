@@ -2,10 +2,7 @@ package com.schoolmanagement.authentication.dto.request;
 
 import com.schoolmanagement.authentication.entity.StatutUtilisateur;
 import com.schoolmanagement.authentication.entity.TypeRole;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.util.Set;
 
@@ -20,7 +17,11 @@ public record UtilisateurRequest(
         String email,
 
         @NotBlank
-        @Size(max = 255)
+        @Size(min = 8, max = 30)
+        @Pattern(
+                regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&]).{8,30}$",
+                message = "Le mot de passe doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial"
+        )
         String motDePasse,
 
         @NotBlank

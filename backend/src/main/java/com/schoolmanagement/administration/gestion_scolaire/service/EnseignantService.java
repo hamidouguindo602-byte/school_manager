@@ -7,7 +7,6 @@ import com.schoolmanagement.administration.gestion_scolaire.entity.Enseignant;
 import com.schoolmanagement.administration.gestion_scolaire.repository.EnseignantRepository;
 import com.schoolmanagement.authentication.entity.StatutUtilisateur;
 import com.schoolmanagement.authentication.entity.TypeRole;
-import com.schoolmanagement.authentication.entity.Utilisateur;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +26,7 @@ public class EnseignantService {
 
     @Transactional
     public EnseignantResponse creerEnseignant(EnseignantCreationRequest request) {
-        Utilisateur utilisateur = Utilisateur.builder()
+        Enseignant enseignant = Enseignant.builder()
                 .nom(request.getNom())
                 .prenom(request.getPrenom())
                 .numeroTelephone(request.getNumeroTelephone())
@@ -35,11 +34,7 @@ public class EnseignantService {
                 .motDePasse(passwordEncoder.encode(request.getMotDePasse()))
                 .statut(StatutUtilisateur.ACTIF)
                 .typeRole(TypeRole.ENSEIGNANT)
-                .build();
-
-        Enseignant enseignant = Enseignant.builder()
                 .specialite(request.getSpecialite())
-                .utilisateur(utilisateur)
                 .build();
 
         Enseignant savedEnseignant = enseignantRepository.save(enseignant);
@@ -65,11 +60,10 @@ public class EnseignantService {
         Enseignant enseignant = enseignantRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Enseignant introuvable avec l'ID : " + id));
 
-        Utilisateur utilisateur = enseignant.getUtilisateur();
-        if (request.getNom() != null) utilisateur.setNom(request.getNom());
-        if (request.getPrenom() != null) utilisateur.setPrenom(request.getPrenom());
-        if (request.getNumeroTelephone() != null) utilisateur.setNumeroTelephone(request.getNumeroTelephone());
-        if (request.getEmail() != null) utilisateur.setEmail(request.getEmail());
+        if (request.getNom() != null) enseignant.setNom(request.getNom());
+        if (request.getPrenom() != null) enseignant.setPrenom(request.getPrenom());
+        if (request.getNumeroTelephone() != null) enseignant.setNumeroTelephone(request.getNumeroTelephone());
+        if (request.getEmail() != null) enseignant.setEmail(request.getEmail());
 
         if (request.getSpecialite() != null) {
             enseignant.setSpecialite(request.getSpecialite());
@@ -106,14 +100,13 @@ public class EnseignantService {
     }
 
     private EnseignantResponse mapToResponse(Enseignant enseignant) {
-        Utilisateur u = enseignant.getUtilisateur();
         return EnseignantResponse.builder()
                 .id(enseignant.getId())
-                .nom(u != null ? u.getNom() : null)
-                .prenom(u != null ? u.getPrenom() : null)
-                .numeroTelephone(u != null ? u.getNumeroTelephone() : null)
-                .email(u != null ? u.getEmail() : null)
-                .statut(u != null && u.getStatut() != null ? u.getStatut().name() : null)
+            .nom(enseignant.getNom())
+            .prenom(enseignant.getPrenom())
+            .numeroTelephone(enseignant.getNumeroTelephone())
+            .email(enseignant.getEmail())
+            .statut(enseignant.getStatut() != null ? enseignant.getStatut().name() : null)
                 .specialite(enseignant.getSpecialite())
                 .build();
     }

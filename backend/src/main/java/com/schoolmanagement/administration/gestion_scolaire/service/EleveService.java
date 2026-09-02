@@ -9,7 +9,6 @@ import com.schoolmanagement.administration.gestion_scolaire.repository.EleveRepo
 import com.schoolmanagement.administration.gestion_scolaire.repository.ParentRepository;
 import com.schoolmanagement.authentication.entity.StatutUtilisateur;
 import com.schoolmanagement.authentication.entity.TypeRole;
-import com.schoolmanagement.authentication.entity.Utilisateur;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,16 +29,6 @@ public class EleveService {
 
     @Transactional
     public EleveResponse creerEleve(EleveCreationRequest request) {
-        Utilisateur utilisateur = Utilisateur.builder()
-                .nom(request.getNom())
-                .prenom(request.getPrenom())
-                .numeroTelephone(request.getNumeroTelephone())
-                .email(request.getEmail())
-                .motDePasse(passwordEncoder.encode(request.getMotDePasse()))
-                .statut(StatutUtilisateur.ACTIF)
-                .typeRole(TypeRole.ELEVE)
-                .build();
-
         Parent parent = null;
         if (request.getIdParent() != null) {
             parent = parentRepository.findById(request.getIdParent())
@@ -47,11 +36,17 @@ public class EleveService {
         }
 
         Eleve eleve = Eleve.builder()
-                .dateNaissance(request.getDateNaissance())
-                .adresse(request.getAdresse())
-                .utilisateur(utilisateur)
-                .parent(parent)
-                .build();
+            .nom(request.getNom())
+            .prenom(request.getPrenom())
+            .numeroTelephone(request.getNumeroTelephone())
+            .email(request.getEmail())
+            .motDePasse(passwordEncoder.encode(request.getMotDePasse()))
+            .statut(StatutUtilisateur.ACTIF)
+            .typeRole(TypeRole.ELEVE)
+            .dateNaissance(request.getDateNaissance())
+            .adresse(request.getAdresse())
+            .parent(parent)
+            .build();
 
         Eleve savedEleve = eleveRepository.save(eleve);
         return mapToResponse(savedEleve);
@@ -76,18 +71,17 @@ public class EleveService {
         Eleve eleve = eleveRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Élève introuvable avec l'ID : " + id));
 
-        Utilisateur utilisateur = eleve.getUtilisateur();
         if (request.getNom() != null) {
-            utilisateur.setNom(request.getNom());
+            eleve.setNom(request.getNom());
         }
         if (request.getPrenom() != null) {
-            utilisateur.setPrenom(request.getPrenom());
+            eleve.setPrenom(request.getPrenom());
         }
         if (request.getNumeroTelephone() != null) {
-            utilisateur.setNumeroTelephone(request.getNumeroTelephone());
+            eleve.setNumeroTelephone(request.getNumeroTelephone());
         }
         if (request.getEmail() != null) {
-            utilisateur.setEmail(request.getEmail());
+            eleve.setEmail(request.getEmail());
         }
 
         if (request.getDateNaissance() != null) {
@@ -143,14 +137,13 @@ public class EleveService {
     }
 
     private EleveResponse mapToResponse(Eleve eleve) {
-        Utilisateur u = eleve.getUtilisateur();
         return EleveResponse.builder()
                 .id(eleve.getId())
-                .nom(u != null ? u.getNom() : null)
-                .prenom(u != null ? u.getPrenom() : null)
-                .numeroTelephone(u != null ? u.getNumeroTelephone() : null)
-                .email(u != null ? u.getEmail() : null)
-                .statut(u != null && u.getStatut() != null ? u.getStatut().name() : null)
+            .nom(eleve.getNom())
+            .prenom(eleve.getPrenom())
+            .numeroTelephone(eleve.getNumeroTelephone())
+            .email(eleve.getEmail())
+            .statut(eleve.getStatut() != null ? eleve.getStatut().name() : null)
                 .dateNaissance(eleve.getDateNaissance())
                 .adresse(eleve.getAdresse())
                 .idParent(eleve.getParent() != null ? eleve.getParent().getId() : null)

@@ -4,6 +4,7 @@ import com.schoolmanagement.authentication.dto.request.LogRequest;
 import com.schoolmanagement.authentication.dto.response.LogResponse;
 import com.schoolmanagement.authentication.entity.Log;
 import com.schoolmanagement.authentication.service.LogService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,7 +49,7 @@ public class LogController {
     }
 
     @PostMapping
-    public ResponseEntity<LogResponse> createLog(@RequestBody LogRequest request) {
+    public ResponseEntity<LogResponse> createLog(@Valid @RequestBody LogRequest request) {
         Log log = logService.createLog(request);
         LogResponse response = LogResponse.builder()
                 .id(log.getId())
