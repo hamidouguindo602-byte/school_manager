@@ -15,6 +15,10 @@ FROM eclipse-temurin:21-jre AS runtime
 WORKDIR /app
 
 RUN addgroup --system spring && adduser --system --ingroup spring spring
+
+# Ajout du dossier uploads avec les droits pour l'utilisateur spring
+RUN mkdir -p /app/uploads && chown -R spring:spring /app/uploads
+
 USER spring:spring
 
 COPY --from=build /app/target/*.jar app.jar

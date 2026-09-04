@@ -23,7 +23,7 @@ public class AbsenceResponse {
     private String prenomEnseignant;
     
     // Infos créneau horaire
-    private String jour;           // LUNDI, MARDI...
+    private String jour;             // LUNDI, MARDI...
     private LocalTime heureDebut;  // 08:00
     private LocalTime heureFin;    // 10:00
     
@@ -32,4 +32,10 @@ public class AbsenceResponse {
     private Boolean justifiee;
     private String motif;
     private LocalDate dateJustification;
+    
+    // Champs du document mis à jour (alignés avec l'entité)
+    private String documentPath;
+    private String documentName;
+    private String documentType;
+    private Long documentSize;
 }
