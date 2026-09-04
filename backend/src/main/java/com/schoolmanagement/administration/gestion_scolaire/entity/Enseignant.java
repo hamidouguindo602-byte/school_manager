@@ -15,10 +15,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Enseignant extends EntieBase {
 
-    @Column(nullable = false, length = 100)
-    private String specialite;
+@Column(nullable = false, length = 100)
+private String specialite;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "idUtilisateur", nullable = false, unique = true)
-    private Utilisateur utilisateur;
+@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+@JoinColumn(name = "idUtilisateur", nullable = false, unique = true)
+private Utilisateur utilisateur;
 }

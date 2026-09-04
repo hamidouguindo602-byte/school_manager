@@ -13,9 +13,12 @@ import com.schoolmanagement.authentication.entity.TypeRole;
 import com.schoolmanagement.authentication.entity.Utilisateur;
 import com.schoolmanagement.authentication.repository.UtilisateurRepository;
 import com.schoolmanagement.common.exception.ResourceNotFoundException;
+import com.schoolmanagement.common.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +29,7 @@ public class AbsenceService {
     private final AbsenceRepository absenceRepository;
     private final UtilisateurRepository utilisateurRepository;
     private final EmploiDuTempsRepository edtRepository;
+    private final FileStorageService fileStorageService;
 
     @Transactional(readOnly = true)
     public List<AbsenceResponse> obtenirAbsencesEleve(Long eleveId) {
@@ -70,7 +74,6 @@ public class AbsenceService {
         EmploiDuTemps edt = edtRepository.findById(req.getEmploiDuTempsId())
                 .orElseThrow(() -> new ResourceNotFoundException("Créneau", req.getEmploiDuTempsId()));
 
-        // Vérifier que l'élève a le rôle ELEVE
         if (eleve.getTypeRole() != TypeRole.ELEVE) {
             throw new IllegalArgumentException("Seuls les élèves peuvent avoir des absences");
         }
@@ -86,7 +89,7 @@ public class AbsenceService {
     }
 
     @Transactional
-    public AbsenceResponse justifierAbsence(Long id, JustificationRequest req) {
+    public AbsenceResponse justifierAbsence(Long id, JustificationRequest req, MultipartFile fichierPdf) {
         Absence abs = absenceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Absence", id));
                 
@@ -97,6 +100,30 @@ public class AbsenceService {
         abs.setJustifiee(true);
         abs.setMotif(req.getMotif());
         abs.setDateJustification(LocalDate.now());
+        
+        if (fichierPdf != null && !fichierPdf.isEmpty()) {
+            String fileName = fileStorageService.storeFile(fichierPdf);
+            abs.setDocumentPath(fileName);
+            abs.setDocumentName(fichierPdf.getOriginalFilename());
+            abs.setDocumentType(fichierPdf.getContentType());
+            abs.setDocumentSize(fichierPdf.getSize());
+        }
+        
+        return mapToDto(absenceRepository.save(abs));
+    }
+
+    @Transactional
+    public AbsenceResponse uploaderDocumentAbsence(Long id, MultipartFile fichierPdf) {
+        Absence abs = absenceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Absence", id));
+        
+        if (fichierPdf != null && !fichierPdf.isEmpty()) {
+            String fileName = fileStorageService.storeFile(fichierPdf);
+            abs.setDocumentPath(fileName);
+            abs.setDocumentName(fichierPdf.getOriginalFilename());
+            abs.setDocumentType(fichierPdf.getContentType());
+            abs.setDocumentSize(fichierPdf.getSize());
+        }
         
         return mapToDto(absenceRepository.save(abs));
     }
@@ -146,6 +173,11 @@ public class AbsenceService {
                 .justifiee(a.getJustifiee())
                 .motif(a.getMotif())
                 .dateJustification(a.getDateJustification())
+                // Mapping des champs du document mis à jour
+                .documentPath(a.getDocumentPath())
+                .documentName(a.getDocumentName())
+                .documentType(a.getDocumentType())
+                .documentSize(a.getDocumentSize())
                 .build();
     }
 }

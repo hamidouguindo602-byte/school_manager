@@ -8,8 +8,10 @@ import com.schoolmanagement.administration.absences.dto.response.AbsenceStatsRes
 import com.schoolmanagement.administration.absences.service.AbsenceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -53,9 +55,20 @@ public class AbsenceController {
         return ResponseEntity.ok(service.declarerAbsence(req));
     }
 
-    @PutMapping("/{id}/justifier")
-    public ResponseEntity<AbsenceResponse> justifier(@PathVariable Long id, @Valid @RequestBody JustificationRequest req) {
-        return ResponseEntity.ok(service.justifierAbsence(id, req));
+    // 1. Endpoint pour le Motif (Reçoit du JSON pur)
+    @PutMapping(value = "/{id}/justifier")
+    public ResponseEntity<AbsenceResponse> justifierMotif(
+            @PathVariable Long id,
+            @Valid @RequestBody JustificationRequest req) {
+        return ResponseEntity.ok(service.justifierAbsence(id, req, null));
+    }
+
+    // 2. Endpoint séparé pour le Document (Reçoit du Multipart / Fichier)
+    @PutMapping(value = "/{id}/document", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AbsenceResponse> uploaderDocument(
+            @PathVariable Long id,
+            @RequestParam("document") MultipartFile document) {
+        return ResponseEntity.ok(service.uploaderDocumentAbsence(id, document));
     }
 
     @PutMapping("/batch-justifier")

@@ -37,4 +37,15 @@ public class Absence extends EntieBase {
     private String motif;
 
     private LocalDate dateJustification;
+
+    @Column(length = 500)
+    private String documentPath;
+
+    @Column(length = 255)
+    private String documentName;
+
+    @Column(length = 100)
+    private String documentType;
+
+    private Long documentSize;
 }
