@@ -1,6 +1,7 @@
 package com.schoolmanagement.authentication.securite;
 
 import com.schoolmanagement.authentication.entity.Permission;
+import com.schoolmanagement.authentication.entity.StatutUtilisateur;
 import com.schoolmanagement.authentication.entity.Utilisateur;
 import com.schoolmanagement.authentication.repository.UtilisateurRepository;
 import io.jsonwebtoken.Claims;
@@ -8,100 +9,80 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class FiltreSecurite extends OncePerRequestFilter {
 
-    private final ServiceJeton serviceJeton;
-    private final UtilisateurRepository utilisateurRepository;
+  private final ServiceJeton serviceJeton;
+  private final UtilisateurRepository utilisateurRepository;
 
-    public FiltreSecurite(
-            ServiceJeton serviceJeton,
-            UtilisateurRepository utilisateurRepository) {
+  public FiltreSecurite(ServiceJeton serviceJeton, UtilisateurRepository utilisateurRepository) {
 
-        this.serviceJeton = serviceJeton;
-        this.utilisateurRepository = utilisateurRepository;
+    this.serviceJeton = serviceJeton;
+    this.utilisateurRepository = utilisateurRepository;
+  }
+
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
+
+    String authorization = request.getHeader("Authorization");
+
+    // Pas de JWT : on laisse Spring Security décider
+    if (authorization == null || !authorization.startsWith("Bearer ")) {
+
+      filterChain.doFilter(request, response);
+      return;
     }
 
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    String token = authorization.substring(7);
 
-        String authorization = request.getHeader("Authorization");
+    try {
+      // Vérifier le JWT
+      Claims claims = serviceJeton.verifierToken(token);
 
-        // Pas de JWT : on laisse Spring Security décider
-        if (authorization == null ||
-                !authorization.startsWith("Bearer ")) {
+      // Récupérer l'ID de l'utilisateur
+      Long utilisateurId = Long.valueOf(claims.getSubject());
 
-            filterChain.doFilter(request, response);
-            return;
-        }
+      // Récupérer l'utilisateur en base
+      Utilisateur utilisateur =
+          utilisateurRepository.findWithPermissionsById(utilisateurId).orElseThrow();
 
-        String token = authorization.substring(7);
+      if (utilisateur.getStatut() != StatutUtilisateur.ACTIF) {
+        throw new SecurityException("Compte utilisateur inactif");
+      }
 
-        try {
-            // Vérifier le JWT
-            Claims claims = serviceJeton.verifierToken(token);
+      List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-            // Récupérer l'ID de l'utilisateur
-            Long utilisateurId =
-                    Long.valueOf(claims.getSubject());
+      // Ajouter le rôle
+      authorities.add(new SimpleGrantedAuthority("ROLE_" + utilisateur.getTypeRole().name()));
 
-            // Récupérer l'utilisateur en base
-            Utilisateur utilisateur =
-                    utilisateurRepository.findWithPermissionsById(utilisateurId)
-                            .orElseThrow();
+      // Ajouter les permissions
+      for (Permission permission : utilisateur.getPermissions()) {
 
-            List<SimpleGrantedAuthority> authorities =
-                    new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(permission.getNomPermission()));
+      }
 
-            // Ajouter le rôle
-            authorities.add(
-                    new SimpleGrantedAuthority(
-                            "ROLE_" + utilisateur.getTypeRole().name()
-                    )
-            );
+      // Créer l'authentification
+      UsernamePasswordAuthenticationToken authentication =
+          new UsernamePasswordAuthenticationToken(utilisateurId, null, authorities);
 
-            // Ajouter les permissions
-            for (Permission permission : utilisateur.getPermissions()) {
+      // Enregistrer l'utilisateur connecté
+      SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                authorities.add(
-                        new SimpleGrantedAuthority(
-                                permission.getNomPermission()
-                        )
-                );
-            }
-
-            // Créer l'authentification
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            utilisateurId,
-                            null,
-                            authorities
-                    );
-
-            // Enregistrer l'utilisateur connecté
-            SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(authentication);
-
-                } catch (Exception exception) {
-                        SecurityContextHolder.clearContext();
-                }
-
-                filterChain.doFilter(request, response);
-
+    } catch (RuntimeException exception) {
+      SecurityContextHolder.clearContext();
     }
+
+    filterChain.doFilter(request, response);
+  }
 }

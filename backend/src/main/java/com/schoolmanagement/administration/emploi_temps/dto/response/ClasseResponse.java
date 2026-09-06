@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ClasseResponse {
-    private Long id;
-    private String nomClasse;
-    private String niveau;
+  private Long id;
+  private String nomClasse;
+  private String niveau;
 }

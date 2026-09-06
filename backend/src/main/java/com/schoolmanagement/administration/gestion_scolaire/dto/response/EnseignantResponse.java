@@ -6,11 +6,11 @@ import lombok.Data;
 @Data
 @Builder
 public class EnseignantResponse {
-    private Long id;
-    private String nom;
-    private String prenom;
-    private String numeroTelephone;
-    private String email;
-    private String statut;
-    private String specialite;
+  private Long id;
+  private String nom;
+  private String prenom;
+  private String numeroTelephone;
+  private String email;
+  private String statut;
+  private String specialite;
 }

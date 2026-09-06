@@ -5,67 +5,79 @@ import com.schoolmanagement.authentication.entity.Log;
 import com.schoolmanagement.authentication.entity.Utilisateur;
 import com.schoolmanagement.authentication.repository.LogRepository;
 import com.schoolmanagement.authentication.repository.UtilisateurRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.schoolmanagement.common.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class LogService {
 
-    @Autowired
-    private LogRepository logRepository;
+  private final LogRepository logRepository;
+  private final UtilisateurRepository utilisateurRepository;
 
-    @Autowired
-    private UtilisateurRepository utilisateurRepository;
+  // 🔹 Enregistrer une action
+  public Log enregistrerAction(String action, Long utilisateurId) {
+    return enregistrerAutomatiquement(action, action, "AUTHENTIFICATION", "SUCCES", utilisateurId);
+  }
 
-    // 🔹 Enregistrer une action
-    public Log enregistrerAction(String action, Long utilisateurId) {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Log enregistrerAutomatiquement(
+      String action, String description, String ressource, String resultat, Long utilisateurId) {
+    Utilisateur utilisateur = utilisateurId == null ? null : utilisateurRepository.findById(utilisateurId).orElse(null);
+    return logRepository.save(
+        Log.builder()
+            .action(action)
+            .description(description)
+            .ressource(ressource)
+            .resultat(resultat)
+            .dateAction(LocalDateTime.now())
+            .utilisateur(utilisateur)
+            .build());
+  }
 
-        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+  // 🔹 Créer un log via DTO
+  public Log createLog(LogRequest request) {
 
-        Log log = Log.builder()
-                .action(action)
-                .dateAction(LocalDateTime.now())
-                .utilisateur(utilisateur)
-                .build();
+    Utilisateur utilisateur =
+        utilisateurRepository
+            .findById(request.getUtilisateurId())
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Utilisateur", request.getUtilisateurId()));
 
+    Log log =
+        Log.builder()
+            .action(request.getAction())
+          .description(request.getDescription() == null ? request.getAction() : request.getDescription())
+          .ressource(request.getRessource() == null ? "MANUEL" : request.getRessource())
+          .resultat(request.getResultat() == null ? "SUCCES" : request.getResultat())
+            .dateAction(LocalDateTime.now())
+            .utilisateur(utilisateur)
+            .build();
 
-        return logRepository.save(log);
+    return logRepository.save(log);
+  }
+
+  // 🔹 Récupérer tous les logs
+  public List<Log> getAllLogs() {
+    return logRepository.findAll();
+  }
+
+  // 🔹 Récupérer un log par ID
+  public Log getLogById(Long id) {
+    return logRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Log", id));
+  }
+
+  // 🔹 Supprimer un log
+  public boolean deleteLog(Long id) {
+    if (!logRepository.existsById(id)) {
+      throw new ResourceNotFoundException("Log", id);
     }
-
-    // 🔹 Créer un log via DTO
-    public Log createLog(LogRequest request) {
-
-        Utilisateur utilisateur = utilisateurRepository.findById(request.getUtilisateurId())
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
-
-        Log log = Log.builder()
-                .action(request.getAction())
-                .dateAction(LocalDateTime.now())
-                .utilisateur(utilisateur)
-                .build();
-
-        return logRepository.save(log);
-    }
-
-    // 🔹 Récupérer tous les logs
-    public List<Log> getAllLogs() {
-        return logRepository.findAll();
-    }
-
-    // 🔹 Récupérer un log par ID
-    public Log getLogById(Long id) {
-        return logRepository.findById(id).orElse(null);
-    }
-
-    // 🔹 Supprimer un log
-    public boolean deleteLog(Long id) {
-        return logRepository.findById(id).map(log -> {
-            logRepository.delete(log);
-            return true;
-        }).orElse(false);
-    }
+    logRepository.deleteById(id);
+    return true;
+  }
 }

@@ -8,13 +8,13 @@ import lombok.Data;
 
 @Data
 public class FormationCreationRequest {
-    @NotBlank(message = "Le nom de la formation est obligatoire")
-    @Size(max = 100)
-    private String nomFormation;
+  @NotBlank(message = "Le nom de la formation est obligatoire")
+  @Size(max = 100)
+  private String nomFormation;
 
-    private String description;
+  private String description;
 
-    @NotNull(message = "La durée est obligatoire")
-    @Positive(message = "La durée doit être supérieure à 0")
-    private Integer duree;
+  @NotNull(message = "La durée est obligatoire")
+  @Positive(message = "La durée doit être supérieure à 0")
+  private Integer duree;
 }

@@ -6,11 +6,11 @@ import lombok.Data;
 
 @Data
 public class FormationUpdateRequest {
-    @Size(max = 100)
-    private String nomFormation;
+  @Size(max = 100)
+  private String nomFormation;
 
-    private String description;
+  private String description;
 
-    @Positive(message = "La durée doit être supérieure à 0")
-    private Integer duree;
+  @Positive(message = "La durée doit être supérieure à 0")
+  private Integer duree;
 }

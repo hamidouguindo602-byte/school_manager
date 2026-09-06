@@ -1,8 +1,7 @@
 package com.schoolmanagement.authentication.dto.response;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Setter
@@ -11,11 +10,17 @@ import java.time.LocalDateTime;
 @Builder
 public class LogResponse {
 
-    private Long id;
+  private Long id;
 
-    private String action;
+  private String action;
 
-    private LocalDateTime dateAction;
+  private String description;
 
-    private Long utilisateurId;
+  private String ressource;
+
+  private String resultat;
+
+  private LocalDateTime dateAction;
+
+  private Long utilisateurId;
 }

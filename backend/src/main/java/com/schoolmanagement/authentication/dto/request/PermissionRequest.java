@@ -1,5 +1,7 @@
 package com.schoolmanagement.authentication.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -8,6 +10,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PermissionRequest {
-    private String nomPermission;
-    private String description;
+  @NotBlank
+  @Size(max = 100)
+  private String nomPermission;
+
+  @Size(max = 1000)
+  private String description;
 }

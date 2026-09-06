@@ -2,25 +2,23 @@ package com.schoolmanagement.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * Autorise le frontend React (Vite) a appeler l'API.
- */
+/** Autorise le frontend React (Vite) a appeler l'API. */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-	@Value("${app.cors.allowed-origins}")
-	private String[] allowedOrigins;
+  @Value("${app.cors.allowed-origins}")
+  private String[] allowedOrigins;
 
-	@Override
-	public void addCorsMappings(@NonNull CorsRegistry registry) {
-		registry.addMapping("/api/**")
-				.allowedOrigins(allowedOrigins)
-				.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-				.allowedHeaders("*")
-				.allowCredentials(true);
-	}
-}
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry
+        .addMapping("/api/**")
+        .allowedOrigins(allowedOrigins)
+        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+        .allowedHeaders("*")
+        .allowCredentials(true);
+  }
+      }

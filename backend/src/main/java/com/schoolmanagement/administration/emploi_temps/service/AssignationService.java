@@ -1,5 +1,7 @@
 package com.schoolmanagement.administration.emploi_temps.service;
 
+import com.schoolmanagement.common.audit.JournaliserAutomatiquement;
+
 import com.schoolmanagement.administration.emploi_temps.dto.request.AssignationRequest;
 import com.schoolmanagement.administration.emploi_temps.dto.response.AssignationResponse;
 import com.schoolmanagement.administration.emploi_temps.entity.Assignation;
@@ -12,6 +14,7 @@ import com.schoolmanagement.administration.emploi_temps.entity.Matiere;
 import com.schoolmanagement.administration.emploi_temps.repository.MatiereRepository;
 import com.schoolmanagement.authentication.entity.Utilisateur;
 import com.schoolmanagement.authentication.repository.UtilisateurRepository;
+import com.schoolmanagement.common.exception.ResourceNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@JournaliserAutomatiquement
 public class AssignationService {
 
     private final AssignationRepository assignationRepository;
@@ -32,13 +36,13 @@ public class AssignationService {
     @Transactional
     public AssignationResponse creerAssignation(AssignationRequest request) {
         Classe classe = classeRepository.findById(request.getClasseId())
-                .orElseThrow(() -> new RuntimeException("Classe introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Classe", request.getClasseId()));
         
         Matiere matiere = matiereRepository.findById(request.getMatiereId())
-                .orElseThrow(() -> new RuntimeException("Matière introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Matière", request.getMatiereId()));
         
         Utilisateur enseignant = utilisateurRepository.findById(request.getEnseignantId())
-                .orElseThrow(() -> new RuntimeException("Enseignant introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Enseignant", request.getEnseignantId()));
 
         Assignation assignation = Assignation.builder()
                 .classe(classe)
@@ -54,16 +58,16 @@ public class AssignationService {
     @Transactional
     public AssignationResponse modifierAssignation(Long id, AssignationRequest request) {
         Assignation assignation = assignationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Assignation introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Assignation", id));
 
         Classe classe = classeRepository.findById(request.getClasseId())
-                .orElseThrow(() -> new RuntimeException("Classe introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Classe", request.getClasseId()));
         
         Matiere matiere = matiereRepository.findById(request.getMatiereId())
-                .orElseThrow(() -> new RuntimeException("Matière introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Matière", request.getMatiereId()));
         
         Utilisateur enseignant = utilisateurRepository.findById(request.getEnseignantId())
-                .orElseThrow(() -> new RuntimeException("Enseignant introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Enseignant", request.getEnseignantId()));
 
         assignation.setClasse(classe);
         assignation.setMatiere(matiere);
@@ -74,13 +78,15 @@ public class AssignationService {
         return mapToResponse(updated);
     }
 
-    public List<AssignationResponse> listerToutes() {
+        @Transactional
+        public List<AssignationResponse> listerToutes() {
         return assignationRepository.findAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    public List<AssignationResponse> listerParClasse(Long classeId) {
+        @Transactional
+        public List<AssignationResponse> listerParClasse(Long classeId) {
         return assignationRepository.findByClasseId(classeId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -89,7 +95,7 @@ public class AssignationService {
     @Transactional
     public void supprimerAssignation(Long id) {
         if (!assignationRepository.existsById(id)) {
-            throw new RuntimeException("Assignation introuvable");
+            throw new ResourceNotFoundException("Assignation", id);
         }
         assignationRepository.deleteById(id);
     }

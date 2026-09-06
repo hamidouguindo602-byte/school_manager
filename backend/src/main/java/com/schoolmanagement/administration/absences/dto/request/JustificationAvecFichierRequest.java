@@ -5,5 +5,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class JustificationAvecFichierRequest {
-    private MultipartFile documentJustificatif;
+  private MultipartFile documentJustificatif;
 }

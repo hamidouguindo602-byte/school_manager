@@ -1,7 +1,7 @@
 package com.schoolmanagement.authentication.service;
 
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -10,29 +10,30 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+  private final JavaMailSender mailSender;
 
-    public void envoyerLienReinitialisation(
-            String email,
-            String token) {
+  @Value("${app.frontend-url:http://localhost:5173}")
+  private String frontendUrl;
 
-        String lien =
-                "http://localhost:5173/reinitialiser-mot-de-passe?token="
-                        + token;
+  public void envoyerLienReinitialisation(String email, String token) {
 
-        SimpleMailMessage message = new SimpleMailMessage();
+    String lien = frontendUrl + "/reinitialiser-mot-de-passe?token=" + token;
 
-        message.setTo(email);
-        message.setSubject("Réinitialisation du mot de passe");
-        message.setText(
-                "Bonjour,\n\n"
-                        + "réinitialiser votre mot de passe en .\n\n"
-                        + "Cliquant sur le lien suivant :\n"
-                        + lien
-                        + "\n\n"
-                        + "Ce lien est valable pendant 15 minutes."
-        );
+    SimpleMailMessage message = new SimpleMailMessage();
 
-        mailSender.send(message);
-    }
+    message.setTo(email);
+    message.setSubject("Réinitialisation du mot de passe");
+    message.setText(
+        """
+        Bonjour,
+
+        Pour reinitialiser votre mot de passe, cliquez sur le lien suivant :
+        %s
+
+        Ce lien est valable pendant 15 minutes.
+        """
+            .formatted(lien));
+
+    mailSender.send(message);
+  }
 }

@@ -13,9 +13,9 @@ import lombok.*;
 @Builder
 public class Permission extends EntieBase {
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String nomPermission;
+  @Column(nullable = false, unique = true, length = 100)
+  private String nomPermission;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+  @Column(columnDefinition = "TEXT")
+  private String description;
 }

@@ -1,85 +1,53 @@
 package com.schoolmanagement.authentication.securite;
 
-
-
 import com.schoolmanagement.authentication.entity.TypeRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ServiceJeton {
 
-    private final SecretKey secretKey;
-    private final long expiration;
+  private final SecretKey secretKey;
+  private final long expiration;
 
-    public ServiceJeton(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expiration) {
+  public ServiceJeton(
+      @Value("${jwt.secret}") String secret, @Value("${jwt.expiration}") long expiration) {
 
-        this.secretKey = Keys.hmacShaKeyFor(
-                secret.getBytes(StandardCharsets.UTF_8)
-        );
-
-        this.expiration = expiration;
+    if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+      throw new IllegalStateException("JWT_SECRET doit contenir au moins 32 octets");
+    }
+    if (expiration <= 0) {
+      throw new IllegalStateException("JWT_EXPIRATION doit etre strictement positif");
     }
 
-    public String genererToken(Long utilisateurId, TypeRole role) {
+    this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
-        Date maintenant = new Date();
+    this.expiration = expiration;
+  }
 
-        Date expirationDate = new Date(
-                maintenant.getTime() + expiration
-        );
+  public String genererToken(Long utilisateurId, TypeRole role) {
 
-        return Jwts.builder()
-                .subject(utilisateurId.toString())
-                .claim("role", role.name())
-                .issuedAt(maintenant)
-                .expiration(expirationDate)
-                .signWith(secretKey)
-                .compact();
-    }
+    Date maintenant = new Date();
 
-    public Claims verifierToken(String token) {
+    Date expirationDate = new Date(maintenant.getTime() + expiration);
 
-        return Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
+    return Jwts.builder()
+        .subject(utilisateurId.toString())
+        .claim("role", role.name())
+        .issuedAt(maintenant)
+        .expiration(expirationDate)
+        .signWith(secretKey)
+        .compact();
+  }
+
+  public Claims verifierToken(String token) {
+
+    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

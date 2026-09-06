@@ -14,7 +14,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Enseignant extends Utilisateur {
 
-    @Column(nullable = false, length = 100)
-    private String specialite;
-
+  @Column(nullable = false, length = 100)
+  private String specialite;
 }

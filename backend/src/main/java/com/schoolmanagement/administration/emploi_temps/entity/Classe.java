@@ -12,9 +12,9 @@ import lombok.*;
 @Entity
 @Table(name = "classes")
 public class Classe extends EntieBase {
-    @Column(nullable = false, length = 50)
-    private String nomClasse;
+  @Column(nullable = false, length = 50)
+  private String nomClasse;
 
-    @Column(nullable = false, length = 50)
-    private String niveau;
+  @Column(nullable = false, length = 50)
+  private String niveau;
 }

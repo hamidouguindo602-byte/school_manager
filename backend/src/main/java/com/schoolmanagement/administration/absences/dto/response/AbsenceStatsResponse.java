@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class AbsenceStatsResponse {
-    private long total;
-    private long justifiees;
-    private long nonJustifiees;
-    private double tauxAbsence;
+  private long total;
+  private long justifiees;
+  private long nonJustifiees;
+  private double tauxAbsence;
 }

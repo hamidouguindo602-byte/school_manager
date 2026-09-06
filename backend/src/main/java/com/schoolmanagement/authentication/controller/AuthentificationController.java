@@ -10,40 +10,43 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping({"/api/authentification"})
 @RequiredArgsConstructor
 public class AuthentificationController {
 
-    private final AuthentificationService authentificationService;
+  private final AuthentificationService authentificationService;
 
-    @PostMapping("/connexion")
-    public ConnexionResponse connexion(
-            @Valid @RequestBody ConnexionRequest request) {
+  @PostMapping("/connexion")
+  public ConnexionResponse connexion(@Valid @RequestBody ConnexionRequest request) {
 
-        return authentificationService.connexion(request);
-    }
+    return authentificationService.connexion(request);
+  }
 
-    @PutMapping("/modifier-mot-de-passe")
-    public String modifierMotDePasse(
-            @Valid @RequestBody ModificationMotDePasseRequest request) {
+  @PutMapping("/modifier-mot-de-passe")
+  public String modifierMotDePasse(@Valid @RequestBody ModificationMotDePasseRequest request) {
 
-        return authentificationService.modifierMotDePasse(request);
-    }
+    return authentificationService.modifierMotDePasse(request);
+  }
 
-    @PostMapping("/mot-de-passe-oublie")
-    public String demanderReinitialisation(
-            @Valid @RequestBody DemandeReinitialisationMotDePasseRequest request) {
+  @PostMapping("/deconnexion")
+  public String deconnexion() {
+    return authentificationService.deconnexion();
+  }
 
-        return authentificationService.demanderReinitialisation(request);
-    }
+  @PostMapping("/mot-de-passe-oublie")
+  public String demanderReinitialisation(
+      @Valid @RequestBody DemandeReinitialisationMotDePasseRequest request) {
 
-    @PostMapping("/reinitialiser-mot-de-passe")
-    public String reinitialiserMotDePasse(
-            @Valid @RequestBody ReinitialisationMotDePasseRequest request) {
+    return authentificationService.demanderReinitialisation(request);
+  }
 
-        return authentificationService.reinitialiserMotDePasse(request);
-    }
+  @PostMapping("/reinitialiser-mot-de-passe")
+  public String reinitialiserMotDePasse(
+      @Valid @RequestBody ReinitialisationMotDePasseRequest request) {
 
+    return authentificationService.reinitialiserMotDePasse(request);
+  }
 }

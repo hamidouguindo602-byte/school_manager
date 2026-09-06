@@ -12,13 +12,15 @@ import lombok.*;
 @Entity
 @Table(name = "matieres")
 public class Matiere extends EntieBase {
-    @Column(nullable = false, length = 50)
-    private String nomMatiere;
+  @Column(nullable = false, length = 50)
+  private String nomMatiere;
 
-    @Column(nullable = false)
-    private Float coefficient;
-    @Column(length = 20)
-    private String code;
-    @Column(length = 100)
-    private String nom;
+  @Column(nullable = false)
+  private Float coefficient;
+
+  @Column(length = 20)
+  private String code;
+
+  @Column(length = 100)
+  private String nom;
 }

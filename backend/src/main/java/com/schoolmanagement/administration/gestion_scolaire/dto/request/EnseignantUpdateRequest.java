@@ -6,19 +6,19 @@ import lombok.Data;
 
 @Data
 public class EnseignantUpdateRequest {
-    @Size(max = 50)
-    private String nom;
+  @Size(max = 50)
+  private String nom;
 
-    @Size(max = 50)
-    private String prenom;
+  @Size(max = 50)
+  private String prenom;
 
-    @Size(max = 20)
-    private String numeroTelephone;
+  @Size(max = 20)
+  private String numeroTelephone;
 
-    @Email(message = "Format d'email invalide")
-    @Size(max = 100)
-    private String email;
+  @Email(message = "Format d'email invalide")
+  @Size(max = 100)
+  private String email;
 
-    @Size(max = 100)
-    private String specialite;
+  @Size(max = 100)
+  private String specialite;
 }

@@ -1,19 +1,18 @@
 package com.schoolmanagement.administration.gestion_scolaire.dto.request;
 
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-
 import java.time.LocalDate;
+import lombok.Data;
 
 @Data
 public class AnneeScolariteUpdateRequest {
-    @Size(max = 50)
-    private String libelle;
+  @Size(max = 50)
+  private String libelle;
 
-    private LocalDate dateDebut;
+  private LocalDate dateDebut;
 
-    private LocalDate dateFin;
+  private LocalDate dateFin;
 
-    @Size(max = 20)
-    private String statut;
+  @Size(max = 20)
+  private String statut;
 }

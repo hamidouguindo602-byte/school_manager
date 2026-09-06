@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PermissionResponse {
-    private Long id;
-    private String nomPermission;
-    private String description;
+  private Long id;
+  private String nomPermission;
+  private String description;
 }

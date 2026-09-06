@@ -1,6 +1,5 @@
 package com.schoolmanagement.authentication.securite;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,44 +15,42 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class ConfigurationSecurite {
 
-        private final FiltreSecurite filtreSecurite;
+  private final FiltreSecurite filtreSecurite;
 
-        public ConfigurationSecurite(FiltreSecurite filtreSecurite) {
-                this.filtreSecurite = filtreSecurite;
-        }
+  public ConfigurationSecurite(FiltreSecurite filtreSecurite) {
+    this.filtreSecurite = filtreSecurite;
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-                .csrf(csrf -> csrf.disable())
+    http.csrf(csrf -> csrf.disable())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(HttpMethod.OPTIONS, "/**")
+                    .permitAll()
+                    .requestMatchers(
+                        "/api/authentification/connexion",
+                        "/api/authentification/mot-de-passe-oublie",
+                        "/api/authentification/reinitialiser-mot-de-passe",
+                            // Swagger
+                            "/swagger-ui/**",
+                            "/swagger-ui.html",
+                            "/v3/api-docs/**")
+                    .permitAll()
+                    .requestMatchers("/actuator/health")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .addFilterBefore(filtreSecurite, UsernamePasswordAuthenticationFilter.class);
 
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
-
-                .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                                .requestMatchers(
-                                        "/api/authentification/connexion",
-                                        "/api/authentification/mot-de-passe-oublie",
-                                        "/api/authentification/reinitialiser-mot-de-passe"
-                                ).permitAll()
-                                .anyRequest().permitAll()
-                )
-                .addFilterBefore(
-                        filtreSecurite,
-                        UsernamePasswordAuthenticationFilter.class
-                );
-
-        return http.build();
-    }
+    return http.build();
+  }
 }

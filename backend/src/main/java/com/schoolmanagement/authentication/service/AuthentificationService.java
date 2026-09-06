@@ -1,6 +1,5 @@
 package com.schoolmanagement.authentication.service;
 
-
 import com.schoolmanagement.authentication.dto.request.ConnexionRequest;
 import com.schoolmanagement.authentication.dto.request.DemandeReinitialisationMotDePasseRequest;
 import com.schoolmanagement.authentication.dto.request.ModificationMotDePasseRequest;
@@ -13,169 +12,135 @@ import com.schoolmanagement.authentication.repository.PasswordResetTokenReposito
 import com.schoolmanagement.authentication.repository.UtilisateurRepository;
 import com.schoolmanagement.authentication.securite.ServiceJeton;
 import com.schoolmanagement.common.exception.AuthentificationException;
+import com.schoolmanagement.common.audit.JournaliserAutomatiquement;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 @Service
+@JournaliserAutomatiquement
 @RequiredArgsConstructor
 public class AuthentificationService {
-    private final PasswordEncoder passwordEncoder;
-    private final UtilisateurRepository utilisateurRepository;
-    private final LogService logService;
-    private final ServiceJeton serviceJeton;
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
-    private final EmailService emailService;
+  private final PasswordEncoder passwordEncoder;
+  private final UtilisateurRepository utilisateurRepository;
+  private final ServiceJeton serviceJeton;
+  private final PasswordResetTokenRepository passwordResetTokenRepository;
+  private final EmailService emailService;
 
-    public ConnexionResponse connexion(ConnexionRequest request){
-        //etape 1: verifier que l'utilisateur existe dans la base.
-        Utilisateur utilisateur = utilisateurRepository.findByIdentifiant(request.identifiant())
-                .orElseThrow(() ->
-                        new AuthentificationException("Identifiant ou mot de passe incorrect")
-                );
-        // Étape 2 : vérifier que le compte est actif
-        if (utilisateur.getStatut() != StatutUtilisateur.ACTIF) {
-            throw new AuthentificationException(
-                    "Le compte est inactif"
-            );
-        }
-
-// Étape 3 : vérifier le mot de passe
-        if (!passwordEncoder.matches(
-                request.motDePasse(),
-                utilisateur.getMotDePasse())) {
-
-            throw new AuthentificationException(
-                    "Identifiant ou mot de passe incorrect"
-            );
-        }
-        //Etape 4: enregistrer l'action de l'utilisateurs dans la journalisation
-        logService.enregistrerAction("CONNEXION", utilisateur.getId());
-// Creation du token
-        String token = serviceJeton.genererToken(
-                utilisateur.getId(),
-                utilisateur.getTypeRole()
-        );
-
-        return new ConnexionResponse(
-                token,
-                utilisateur.getTypeRole()
-        );
+  public ConnexionResponse connexion(ConnexionRequest request) {
+    // etape 1: verifier que l'utilisateur existe dans la base.
+    Utilisateur utilisateur =
+        utilisateurRepository
+            .findByIdentifiant(request.identifiant())
+            .orElseThrow(
+                () -> new AuthentificationException("Identifiant ou mot de passe incorrect"));
+    // Étape 2 : vérifier que le compte est actif
+    if (utilisateur.getStatut() != StatutUtilisateur.ACTIF) {
+      throw new AuthentificationException("Le compte est inactif");
     }
 
-    public String modifierMotDePasse(ModificationMotDePasseRequest request) {
+    // Étape 3 : vérifier le mot de passe
+    if (!passwordEncoder.matches(request.motDePasse(), utilisateur.getMotDePasse())) {
 
-        // Récupérer l'ID de l'utilisateur connecté
-        Object principal = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+      throw new AuthentificationException("Identifiant ou mot de passe incorrect");
+    }
+    // Creation du token
+    String token = serviceJeton.genererToken(utilisateur.getId(), utilisateur.getTypeRole());
 
-        if (!(principal instanceof Number)) {
-            throw new AuthentificationException("Utilisateur non authentifie");
-        }
+    return new ConnexionResponse(token, utilisateur.getTypeRole());
+  }
 
-        Long utilisateurId = ((Number) principal).longValue();
+  public String deconnexion() {
+    SecurityContextHolder.clearContext();
+    return "Deconnexion reussie";
+  }
 
-        // Récupérer l'utilisateur
-        Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
-                .orElseThrow(() ->
-                        new AuthentificationException("Utilisateur introuvable")
-                );
+  public String modifierMotDePasse(ModificationMotDePasseRequest request) {
 
-        // Vérifier l'ancien mot de passe
-        if (!passwordEncoder.matches(
-                request.ancienMotDePasse(),
-                utilisateur.getMotDePasse())) {
+    // Récupérer l'ID de l'utilisateur connecté
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-            throw new AuthentificationException(
-                    "Mot de passe incorrect"
-            );
-        }
-
-        // Encoder et sauvegarder le nouveau mot de passe
-        utilisateur.setMotDePasse(
-                passwordEncoder.encode(request.nouveauMotDePasse())
-        );
-
-        utilisateurRepository.save(utilisateur);
-
-        return "Mot de passe modifié avec succès";
+    if (!(principal instanceof Number)) {
+      throw new AuthentificationException("Utilisateur non authentifie");
     }
 
-    public String demanderReinitialisation(
-            DemandeReinitialisationMotDePasseRequest request) {
+    Long utilisateurId = ((Number) principal).longValue();
 
-        Utilisateur utilisateur = utilisateurRepository
-                .findByEmail(request.email())
-                .orElseThrow(() ->
-                        new AuthentificationException(
-                                "Aucun utilisateur trouvé avec cet email"
-                        )
-                );
+    // Récupérer l'utilisateur
+    Utilisateur utilisateur =
+        utilisateurRepository
+            .findById(utilisateurId)
+            .orElseThrow(() -> new AuthentificationException("Utilisateur introuvable"));
 
-        String token = UUID.randomUUID().toString();
+    // Vérifier l'ancien mot de passe
+    if (!passwordEncoder.matches(request.ancienMotDePasse(), utilisateur.getMotDePasse())) {
 
-        PasswordResetToken passwordResetToken = PasswordResetToken.builder()
-                .token(token)
-                .expiryDate(LocalDateTime.now().plusMinutes(15))
-                .used(false)
-                .user(utilisateur)
-                .build();
-
-        passwordResetTokenRepository.save(passwordResetToken);
-                emailService.envoyerLienReinitialisation(utilisateur.getEmail(), token);
-
-        return "Un lien de réinitialisation a été généré";
+      throw new AuthentificationException("Mot de passe incorrect");
     }
 
-    public String reinitialiserMotDePasse(
-            ReinitialisationMotDePasseRequest request) {
+    // Encoder et sauvegarder le nouveau mot de passe
+    utilisateur.setMotDePasse(passwordEncoder.encode(request.nouveauMotDePasse()));
 
-        PasswordResetToken resetToken =
-                passwordResetTokenRepository.findByToken(request.token())
-                        .orElseThrow(() ->
-                                new AuthentificationException(
-                                        "Token de réinitialisation invalide"
-                                )
-                        );
+    utilisateurRepository.save(utilisateur);
 
-        // Vérifier si le token a déjà été utilisé
-        if (resetToken.isUsed()) {
-            throw new AuthentificationException(
-                    "Ce token a déjà été utilisé"
-            );
-        }
+    return "Mot de passe modifié avec succès";
+  }
 
-        // Vérifier si le token a expiré
-        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new AuthentificationException(
-                    "Le token de réinitialisation a expiré"
-            );
-        }
+  public String demanderReinitialisation(DemandeReinitialisationMotDePasseRequest request) {
 
-        // Récupérer l'utilisateur associé au token
-        Utilisateur utilisateur = resetToken.getUser();
+    utilisateurRepository
+        .findByEmail(request.email().trim().toLowerCase())
+        .ifPresent(
+            utilisateur -> {
+              String token = UUID.randomUUID().toString();
+              PasswordResetToken passwordResetToken =
+                  PasswordResetToken.builder()
+                      .token(token)
+                      .expiryDate(LocalDateTime.now().plusMinutes(15))
+                      .used(false)
+                      .user(utilisateur)
+                      .build();
 
-        // Encoder le nouveau mot de passe
-        utilisateur.setMotDePasse(
-                passwordEncoder.encode(
-                        request.nouveauMotDePasse()
-                )
-        );
+              passwordResetTokenRepository.save(passwordResetToken);
+              emailService.envoyerLienReinitialisation(utilisateur.getEmail(), token);
+            });
 
-        // Sauvegarder le nouveau mot de passe
-        utilisateurRepository.save(utilisateur);
+    return "Si un compte correspond à cette adresse, un lien de réinitialisation a été envoyé";
+  }
 
-        // Invalider le token
-        resetToken.setUsed(true);
-        passwordResetTokenRepository.save(resetToken);
+  public String reinitialiserMotDePasse(ReinitialisationMotDePasseRequest request) {
 
-        return "Mot de passe réinitialisé avec succès";
+    PasswordResetToken resetToken =
+        passwordResetTokenRepository
+            .findByToken(request.token())
+            .orElseThrow(() -> new AuthentificationException("Token de réinitialisation invalide"));
+
+    // Vérifier si le token a déjà été utilisé
+    if (resetToken.isUsed()) {
+      throw new AuthentificationException("Ce token a déjà été utilisé");
     }
 
+    // Vérifier si le token a expiré
+    if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+      throw new AuthentificationException("Le token de réinitialisation a expiré");
+    }
+
+    // Récupérer l'utilisateur associé au token
+    Utilisateur utilisateur = resetToken.getUser();
+
+    // Encoder le nouveau mot de passe
+    utilisateur.setMotDePasse(passwordEncoder.encode(request.nouveauMotDePasse()));
+
+    // Sauvegarder le nouveau mot de passe
+    utilisateurRepository.save(utilisateur);
+
+    // Invalider le token
+    resetToken.setUsed(true);
+    passwordResetTokenRepository.save(resetToken);
+
+    return "Mot de passe réinitialisé avec succès";
+  }
 }

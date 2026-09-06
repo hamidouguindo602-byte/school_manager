@@ -2,11 +2,10 @@ package com.schoolmanagement.administration.gestion_scolaire.entity;
 
 import com.schoolmanagement.common.domain.EntieBase;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "formations")
@@ -17,16 +16,16 @@ import java.util.List;
 @SuperBuilder
 public class Formation extends EntieBase {
 
-    @Column(name = "nom_formation", nullable = false, length = 100)
-    private String nomFormation;
+  @Column(name = "nom_formation", nullable = false, length = 100)
+  private String nomFormation;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+  @Column(columnDefinition = "TEXT")
+  private String description;
 
-    @Column(nullable = false)
-    private Integer duree; // Durée en mois ou en années
+  @Column(nullable = false)
+  private Integer duree; // Durée en mois ou en années
 
-    @Builder.Default
-    @OneToMany(mappedBy = "formation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Inscription> inscriptions = new ArrayList();
+  @Builder.Default
+  @OneToMany(mappedBy = "formation", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Inscription> inscriptions = new ArrayList<>();
 }

@@ -1,51 +1,55 @@
 package com.schoolmanagement.administration.evaluations.controller;
 
-import com.schoolmanagement.administration.evaluations.dto.EvaluationRequest;
-import com.schoolmanagement.administration.evaluations.dto.EvaluationResponse;
+import com.schoolmanagement.administration.evaluations.dto.request.EvaluationRequest;
+import com.schoolmanagement.administration.evaluations.dto.response.EvaluationResponse;
 import com.schoolmanagement.administration.evaluations.service.EvaluationService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN') or hasAuthority('EVALUATION_GERER')")
 public class EvaluationController {
 
-    private final EvaluationService evaluationService;
+  private final EvaluationService evaluationService;
 
-    @GetMapping("/evaluations")
-    public ResponseEntity<List<EvaluationResponse>> getAllEvaluations() {
-        return ResponseEntity.ok(evaluationService.findAll());
-    }
+  @GetMapping("/evaluations")
+  public ResponseEntity<List<EvaluationResponse>> getAllEvaluations() {
+    return ResponseEntity.ok(evaluationService.findAll());
+  }
 
-    @GetMapping("/evaluations/{id}")
-    public ResponseEntity<EvaluationResponse> getEvaluationById(@PathVariable Long id) {
-        return ResponseEntity.ok(evaluationService.findById(id));
-    }
+  @GetMapping("/evaluations/{id}")
+  public ResponseEntity<EvaluationResponse> getEvaluationById(@PathVariable Long id) {
+    return ResponseEntity.ok(evaluationService.findById(id));
+  }
 
-    @GetMapping("/classes/{id}/evaluations")
-    public ResponseEntity<List<EvaluationResponse>> getEvaluationsByClasse(@PathVariable Long id) {
-        return ResponseEntity.ok(evaluationService.findByClasse(id));
-    }
+  @GetMapping("/classes/{id}/evaluations")
+  public ResponseEntity<List<EvaluationResponse>> getEvaluationsByClasse(@PathVariable Long id) {
+    return ResponseEntity.ok(evaluationService.findByClasse(id));
+  }
 
-    @PostMapping("/evaluations")
-    public ResponseEntity<EvaluationResponse> createEvaluation(@Valid @RequestBody EvaluationRequest request) {
-        return new ResponseEntity<>(evaluationService.create(request), HttpStatus.CREATED);
-    }
+  @PostMapping("/evaluations")
+  public ResponseEntity<EvaluationResponse> createEvaluation(
+      @Valid @RequestBody EvaluationRequest request) {
+    return new ResponseEntity<>(evaluationService.create(request), HttpStatus.CREATED);
+  }
 
-    @PutMapping("/evaluations/{id}")
-    public ResponseEntity<EvaluationResponse> updateEvaluation(@PathVariable Long id, @Valid @RequestBody EvaluationRequest request) {
-        return ResponseEntity.ok(evaluationService.update(id, request));
-    }
+  @PutMapping("/evaluations/{id}")
+  public ResponseEntity<EvaluationResponse> updateEvaluation(
+      @PathVariable Long id, @Valid @RequestBody EvaluationRequest request) {
+    return ResponseEntity.ok(evaluationService.update(id, request));
+  }
 
-    @DeleteMapping("/evaluations/{id}")
-    public ResponseEntity<Void> deleteEvaluation(@PathVariable Long id) {
-        evaluationService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/evaluations/{id}")
+  public ResponseEntity<Void> deleteEvaluation(@PathVariable Long id) {
+    evaluationService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
+
 }
