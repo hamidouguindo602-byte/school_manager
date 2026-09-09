@@ -1,0 +1,3 @@
+import ResourcePage from '../../components/common/ResourcePage';
+import { createFormation, deleteFormation, getFormations, updateFormation } from '../../api/formations.api';
+export default function FormationsPage() { return <ResourcePage title="Formations" description="Gérez les formations." loader={getFormations} createAction={createFormation} updateAction={updateFormation} deleteAction={deleteFormation} formFields={[{ name: 'nomFormation', label: 'Nom', required: true }, { name: 'description', label: 'Description' }, { name: 'duree', label: 'Durée', type: 'number', required: true }]} columns={[{ label: 'Nom', key: 'nomFormation' }, { label: 'Description', key: 'description' }, { label: 'Durée', key: 'duree' }]} />; }

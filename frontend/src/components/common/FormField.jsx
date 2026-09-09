@@ -1,0 +1,1 @@
+export default function FormField({ label, name, value, onChange, type = 'text', required = false, children }) { return <label className="field">{label}{children || <input name={name} type={type} required={required} value={value ?? ''} onChange={onChange} />}</label>; }

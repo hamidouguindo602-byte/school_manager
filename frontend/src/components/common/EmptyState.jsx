@@ -1,0 +1,1 @@
+export default function EmptyState({ title = 'Aucune donnée', description = 'Aucun élément ne correspond à votre recherche.' }) { return <div className="state-message"><strong>{title}</strong><br />{description}</div>; }

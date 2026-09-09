@@ -1,0 +1,1 @@
+export default function DocumentUpload({ onChange, accept = 'application/pdf,image/*' }) { return <label className="table-action upload-label">Ajouter un document<input hidden type="file" accept={accept} onChange={(event) => onChange(event.target.files[0] || null)} /></label>; }

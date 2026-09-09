@@ -1,0 +1,4 @@
+import DataTablePage from '../../components/common/DataTablePage';
+import { getPaiements } from '../../api/paiements.api';
+
+export default function PaiementsPage() { return <DataTablePage eyebrow="Gestion financière" title="Paiements" description="Suivez les règlements et leur statut en temps réel." loader={getPaiements} emptyLabel="Aucun paiement enregistré." columns={[{ label: 'Date', key: 'datePaiement' }, { label: 'Montant', render: (item) => item.montant ? `${item.montant} €` : '—' }, { label: 'Mode', key: 'modePaiement' }, { label: 'Statut', render: (item) => <span className="status-pill">{item.statut || '—'}</span> }]} />; }

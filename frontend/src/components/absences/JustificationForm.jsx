@@ -1,0 +1,2 @@
+import { useState } from 'react';
+export default function JustificationForm({ onSubmit }) { const [motif, setMotif] = useState(''); return <form className="entity-form" onSubmit={(event) => { event.preventDefault(); onSubmit(motif); }}><label className="field">Motif<textarea required rows="3" value={motif} onChange={(event) => setMotif(event.target.value)} /></label><button className="primary-button">Justifier</button></form>; }

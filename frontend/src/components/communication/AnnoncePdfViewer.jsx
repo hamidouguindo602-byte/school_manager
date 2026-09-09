@@ -1,0 +1,1 @@
+export default function AnnoncePdfViewer({ url }) { return url ? <iframe className="min-h-[520px] w-full border-0" title="Document PDF" src={url} /> : <p className="state-message">Aucun document.</p>; }

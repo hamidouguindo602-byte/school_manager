@@ -1,0 +1,3 @@
+import ResourcePage from '../../components/common/ResourcePage';
+import { createMatiere, deleteMatiere, getMatieres, updateMatiere } from '../../api/matieres.api';
+export default function MatieresPage() { return <ResourcePage title="Matières" description="Gérez les matières." loader={getMatieres} createAction={createMatiere} updateAction={updateMatiere} deleteAction={deleteMatiere} formFields={[{ name: 'nomMatiere', label: 'Nom', required: true }, { name: 'code', label: 'Code', required: true }, { name: 'coefficient', label: 'Coefficient', type: 'number', required: true }]} columns={[{ label: 'Nom', key: 'nomMatiere' }, { label: 'Code', key: 'code' }, { label: 'Coefficient', key: 'coefficient' }]} />; }

@@ -1,0 +1,3 @@
+import ResourcePage from '../../components/common/ResourcePage';
+import { createPermission, deletePermission, getPermissions, updatePermission } from '../../api/permissions.api';
+export default function PermissionsPage() { return <ResourcePage title="Permissions" description="Gérez les droits applicatifs." loader={getPermissions} createAction={createPermission} updateAction={updatePermission} deleteAction={deletePermission} formFields={[{ name: 'nomPermission', label: 'Nom', required: true }, { name: 'description', label: 'Description' }]} columns={[{ label: 'Nom', key: 'nom' }, { label: 'Code', key: 'code' }, { label: 'Description', key: 'description' }]} />; }

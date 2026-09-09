@@ -1,0 +1,10 @@
+import { useEffect, useState } from 'react';
+import { annulerInscription, getInscriptions, validerInscription } from '../../api/inscriptions.api';
+
+export default function InscriptionsPage() {
+  const [items, setItems] = useState([]); const [loading, setLoading] = useState(true); const [error, setError] = useState('');
+  const load = async () => { setLoading(true); try { setItems(await getInscriptions() || []); } catch (requestError) { setError(requestError.message); } finally { setLoading(false); } };
+  useEffect(() => { load(); }, []);
+  const action = async (id, validate) => { try { if (validate) await validerInscription(id); else await annulerInscription(id); await load(); } catch (requestError) { setError(requestError.message); } };
+  return <section className="page-shell"><div className="page-header"><div><p className="eyebrow">Gestion scolaire</p><h1>Inscriptions</h1><p className="page-lead">Validez ou annulez les inscriptions des élèves.</p></div></div>{error && <div className="error-box">{error}</div>}<div className="card-panel entity-panel">{loading ? <p className="state-message">Chargement...</p> : <div className="table-wrap"><table><thead><tr><th>Élève</th><th>Formation</th><th>Classe</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead><tbody>{items.map((item) => <tr key={item.id}><td>{item.nomEleve || item.idEleve || '—'}</td><td>{item.nomFormation || item.idFormation || '—'}</td><td>{item.nomClasse || item.idClasse || '—'}</td><td>{item.dateInscription || '—'}</td><td><span className="status-pill">{item.statut || '—'}</span></td><td><button className="table-action" onClick={() => action(item.id, true)}>Valider</button><button className="table-action danger-action" onClick={() => action(item.id, false)}>Annuler</button></td></tr>)}{!items.length && <tr><td colSpan="6" className="state-message">Aucune inscription.</td></tr>}</tbody></table></div>}</div></section>;
+}

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,11 +29,20 @@ public class NotificationController {
   }
 
   @GetMapping
-  @PreAuthorize("hasRole('ADMIN') or hasAuthority('NOTIFICATION_CONSULTER') or #idUtilisateur == authentication.principal")
+  @PreAuthorize("hasRole('ADMIN') or hasAuthority('NOTIFICATION_CONSULTER')")
   public ResponseEntity<List<NotificationResponse>> consulterMesNotifications(
-      @RequestParam Long idUtilisateur) {
+      @RequestParam(required = false) Long idUtilisateur) {
 
-    return ResponseEntity.ok(notificationService.consulterMesNotifications(idUtilisateur));
+    Long cible = idUtilisateur;
+    if (cible == null) {
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      if (authentication == null || !(authentication.getPrincipal() instanceof Number principal)) {
+        throw new IllegalArgumentException("Utilisateur connecté introuvable");
+      }
+      cible = principal.longValue();
+    }
+
+    return ResponseEntity.ok(notificationService.consulterMesNotifications(cible));
   }
 
   @GetMapping("/{id}")

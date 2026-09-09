@@ -1,0 +1,19 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { loginRequest } from '../../api/auth.api';
+import { useAuth } from '../../auth/AuthProvider';
+
+const features = ['Suivi en temps réel des élèves et des classes', 'Accès sécurisé, un espace dédié par rôle', 'Notes, présences et paiements centralisés'];
+
+export default function ConnexionPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [identifiant, setIdentifiant] = useState('');
+  const [motDePasse, setMotDePasse] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const submit = async (event) => { event.preventDefault(); setError(''); setLoading(true); try { const response = await loginRequest(identifiant, motDePasse); login(response.token, { role: response.role, token: response.token, remember }); navigate('/'); } catch (requestError) { setError(requestError.message || 'Email ou mot de passe incorrect. Réessaie.'); } finally { setLoading(false); } };
+  return <main className="auth-screen-ref"><section className="auth-form-side-ref"><div className="auth-box-ref"><div className="auth-brand-mobile"><span>ET</span> École Les Tournesols</div><h1>Bon retour</h1><p className="auth-sub-ref">Connecte-toi pour accéder à ton espace.</p>{error && <div className="auth-error-ref"><span aria-hidden="true">!</span>{error}</div>}<form onSubmit={submit}><label className="auth-field-ref">Adresse email ou identifiant<input autoComplete="username" required type="text" value={identifiant} onChange={(event) => setIdentifiant(event.target.value)} placeholder="direction@ecole.ma" /></label><label className="auth-field-ref">Mot de passe<div className="auth-password-ref"><input autoComplete="current-password" required type={showPassword ? 'text' : 'password'} value={motDePasse} onChange={(event) => setMotDePasse(event.target.value)} placeholder="••••••••" /><button type="button" aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'} onClick={() => setShowPassword(!showPassword)}>{showPassword ? 'Masquer' : 'Voir'}</button></div></label><div className="auth-options-ref"><label><input type="checkbox" checked={remember} onChange={(event) => setRemember(event.target.checked)} /> Se souvenir de moi</label><Link to="/mot-de-passe-oublie">Mot de passe oublié ?</Link></div><button className="auth-submit-ref" disabled={loading}>{loading && <span className="auth-spinner-ref" />}{loading ? 'Connexion en cours...' : 'Se connecter'} {!loading && <span aria-hidden="true">→</span>}</button></form><p className="security-note-ref"><span aria-hidden="true">⌑</span> Connexion sécurisée et chiffrée</p></div></section><section className="auth-panel-ref"><div className="auth-panel-inner-ref"><div className="auth-panel-top-ref"><div className="auth-logo-ref"><span>ET</span> École Les Tournesols</div><div className="auth-badge-ref"><i /> Plateforme active · Année 2026–2027</div></div><div className="auth-quote-ref"><h2>Toute la vie de l’école, réunie dans une seule plateforme.</h2><p>Un espace de connexion unique, avec une expérience pensée pour chaque rôle : direction, enseignants, parents et élèves.</p></div><div className="auth-features-ref">{features.map((feature) => <div className="auth-feature-ref" key={feature}><span>✓</span>{feature}</div>)}</div><div className="auth-stats-ref"><div><strong>312</strong><small>Élèves suivis</small></div><div><strong>18</strong><small>Enseignants</small></div><div><strong>12</strong><small>Classes</small></div></div><p className="auth-copyright-ref">© 2026 École Les Tournesols — Tous droits réservés</p></div></section></main>;
+}
